@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "cross-env BABEL_DISABLE_CACHE=1 NODE_ENV=development nodemon index.js",
-    "start:dev": "npm run lint && npm start",
-    "start:prod": "npm run lint && npm run prod",
+    "start:dev": "npm start",
+    "start:prod": "gtnpm run prod",
     "prod": "cross-env NODE_ENV=production node index.js",
     "build": "npm run clean && webpack --config webpack.config.prod.js --mode production",
     "clean": "rimraf public/build",

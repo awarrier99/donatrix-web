@@ -19,7 +19,9 @@ module.exports = {
         options: {
           configFile: '.eslintrc',
           failOnWarning: false,
-          failOnError: false
+          failOnError: false,
+          fix: true,
+
         }
       },
       {
