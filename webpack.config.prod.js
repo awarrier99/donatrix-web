@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
+// const Dotenv = require('dotenv-webpack');
 // const ExternalsPlugin = require('webpack2-externals-plugin');
 // var ExtractTextPlugin = require('extract-text-webpack-plugin');
 // var ManifestPlugin = require('webpack-manifest-plugin');
@@ -56,7 +56,7 @@ module.exports = {
   },
   mode: 'production',
   plugins: [
-    new Dotenv({ path: './.env' }),
+    // new Dotenv({ path: './.env' }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
