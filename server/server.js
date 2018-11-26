@@ -55,7 +55,7 @@ require('./routes')(app);
 // start app
 app.listen(PORT, error => {
   if (!error) {
-        console.log(`Donatrix is running on port ${PORT}! Load http://localhost:${PORT} in your browser.`); // eslint-disable-line
+      console.log(`Donatrix is running on port ${PORT}! Load http://localhost:${PORT} in your browser.`); // eslint-disable-line
   }
 });
 
