@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'antd';
 
 class Home extends Component { // eslint-disable-line
   constructor(props) { // eslint-disable-line
@@ -7,9 +8,14 @@ class Home extends Component { // eslint-disable-line
 
   render() {
     return (
-      <h1>
-        Donatrix
-      </h1>
+      <div>
+        <h1>
+          Donatrix
+        </h1>
+        <Button type="primary" onClick={() => alert('Login')}>
+          Login
+        </Button>
+      </div>
     );
   }
 }
