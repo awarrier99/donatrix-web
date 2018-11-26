@@ -15,6 +15,9 @@ class Home extends Component { // eslint-disable-line
         <Button type="primary" onClick={() => alert('Login')}>
           Login
         </Button>
+        <Button type="primary" onClick={() => alert('Register')}>
+          Register
+        </Button>
       </div>
     );
   }
