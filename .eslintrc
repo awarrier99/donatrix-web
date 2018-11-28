@@ -31,7 +31,7 @@
       0
     ],
     // Until import plugin supports webpack 2 resolveModules
-    "no-console": "warn",
+    "no-console": "off",
     "arrow-parens": ["error", "as-needed"],
     "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "react/prop-types": 0
