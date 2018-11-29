@@ -13,6 +13,7 @@
     "lint": "eslint client server"
   },
   "dependencies": {
+    "@babel/polyfill": "7.0.0-beta.51",
     "antd": "^3.10.9",
     "css-loader": "^1.0.1",
     "css-modules-require-hook": "^4.2.3",
@@ -33,7 +34,6 @@
     "@babel/cli": "7.0.0-beta.51",
     "@babel/core": "7.0.0-beta.51",
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.51",
-    "@babel/polyfill": "7.0.0-beta.51",
     "@babel/preset-env": "7.0.0-beta.51",
     "@babel/preset-react": "7.0.0-beta.51",
     "@babel/preset-stage-0": "7.0.0-beta.51",

@@ -21,6 +21,19 @@
   border-color: #ff4d4f;
 }
 
+.select {
+  width: 15%;
+  color: #ff4d4f;
+}
+
+.select:hover {
+  border-color: #ff4d4f;
+}
+
+.select:focus {
+  border-color: #ff4d4f;
+}
+
 .textbutton {
   background: none;
   border: none;

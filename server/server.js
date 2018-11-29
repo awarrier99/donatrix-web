@@ -1,7 +1,6 @@
 const Express = require('express');
 const path = require('path');
 const flash = require('express-flash');
-// const session = require('express-session');
 
 // Initialize the Express App
 const app = new Express();
@@ -9,21 +8,6 @@ const app = new Express();
 // Set Development modes checks
 const isDevMode = process.env.NODE_ENV === 'development' || false;
 const PORT = process.env.PORT || 3000;
-
-// const RedisStore = require('connect-redis')(session);
-//
-// // app.use(session({
-// //   cookie: {
-// //     maxAge: 1209600,
-// //     domain: process.env.NODE_ENV === '.pikapp.net'
-// //   },
-// //   secret: process.env.SECRET,
-// //   resave: true,
-// //   saveUninitialized: false,
-// //   store: new RedisStore({
-// //     ttl: 3600
-// //   })
-// // }));
 
 // Run Webpack dev server in development mode
 if (isDevMode) {

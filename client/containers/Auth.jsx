@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
 import {
-  Input, Row, Col, Button, message
+  Input, Row, Col, Button, message, Select
 } from 'antd';
 import styles from './Auth.css';
 import logo from '../images/logo.png';
+
+const { Option } = Select;
 
 class Auth extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      register: false
+      register: false,
+      locations: [],
+      showLocations: false,
+      type: 'USER',
+      locId: 0
     };
 
     this.frstnameInput = React.createRef();
@@ -19,9 +25,25 @@ class Auth extends Component {
     this.passwordInput = React.createRef();
     this.confpassInput = React.createRef();
     this.logIn = this.logIn.bind(this);
+    this.register = this.register.bind(this);
+    this.handleUserTypeChange = this.handleUserTypeChange.bind(this);
+    this.handleLocationChange = this.handleLocationChange.bind(this);
   }
 
   componentDidMount() {
+    fetch('/api/locations', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          this.setState({ locations: json.locations });
+        }
+      })
+      .catch(console.error);
     message.config({
       top: 100,
       duration: 5,
@@ -30,10 +52,11 @@ class Auth extends Component {
   }
 
   logIn() {
+    const { register } = this.state;
     const username = this.usernameInput.current.input.value;
     const password = this.passwordInput.current.input.value;
     if (username && password) {
-      fetch('/login', {
+      fetch('/api/login', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -47,7 +70,11 @@ class Auth extends Component {
         .then(res => res.json())
         .then(json => {
           if (json.success) {
-            message.success('Logged in successfully');
+            if (!register) message.success('Logged in successfully');
+            const date = new Date((new Date()).getTime() + (60 * 60 * 1000));
+            document.cookie = `session=user:${JSON.stringify(json.user)};expires=${date.toUTCString()};path=/`;
+            const { onLogin } = this.props;
+            onLogin();
           } else {
             message.error(json.msg);
           }
@@ -56,8 +83,64 @@ class Auth extends Component {
     }
   }
 
+  register() {
+    const frstname = this.frstnameInput.current.input.value;
+    const lastname = this.lastnameInput.current.input.value;
+    const name = `${frstname} ${lastname}`;
+    const username = this.usernameInput.current.input.value;
+    const password = this.passwordInput.current.input.value;
+    const { type, locId } = this.state;
+    // const confPass = this.confpassInput.current.input.value; TODO form validation
+    if (frstname && lastname && username && password) {
+      const body = {
+        email: username,
+        password,
+        name,
+        type,
+        locked: 0
+      };
+      if (type === 'LOCATION_EMPLOYEE') body.loc_id = locId;
+      console.log(body);
+      fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (json.success) {
+            message.success('Registered successfully');
+            this.logIn();
+          } else {
+            message.error(json.msg);
+          }
+        })
+        .catch(console.error);
+    }
+  }
+
+  handleUserTypeChange(value) {
+    const showLocations = value.includes('LOC');
+    this.setState({ showLocations, type: value });
+  }
+
+  handleLocationChange(value) {
+    this.setState({ locId: value });
+  }
+
   render() {
-    const { register } = this.state;
+    const { register, locations, showLocations } = this.state;
+    const locationOptions = [];
+    const createOptions = i => {
+      const loc = locations[i];
+      return <Option value={loc.idLocation} key={i}>{loc.Name}</Option>;
+    };
+    for (let i = 0; i < locations.length; i += 1) {
+      locationOptions.push(createOptions(i));
+    }
     return (
       <div className={styles.auth}>
         <div style={{ display: 'table-cell', verticalAlign: 'middle' }}>
@@ -78,7 +161,7 @@ class Auth extends Component {
           {register ? (
             <Row type="flex" justify="center">
               <Col span={4}>
-                <Input className={styles.input} ref={this.lastnameInput} placeholder="Last Name" type="password" />
+                <Input className={styles.input} ref={this.lastnameInput} placeholder="Last Name" />
               </Col>
             </Row>
           ) : null}
@@ -93,7 +176,15 @@ class Auth extends Component {
           <br />
           <Row type="flex" justify="center">
             <Col span={4}>
-              <Input className={styles.input} ref={this.passwordInput} placeholder="Password" type="password" />
+              <Input
+                className={styles.input}
+                ref={this.passwordInput}
+                placeholder="Password"
+                type="password"
+                onKeyPress={e => {
+                  if (e.key === 'Enter') this.logIn();
+                }}
+              />
             </Col>
           </Row>
           <br />
@@ -107,21 +198,49 @@ class Auth extends Component {
           {register ? (
             <br />
           ) : null}
+          {register ? (
+            <Row type="flex" justify="center">
+              <Select className={styles.select} defaultValue="USER" onChange={this.handleUserTypeChange}>
+                <Option value="USER">User</Option>
+                <Option value="LOCATION_EMPLOYEE">Location Employee</Option>
+                <Option value="MANAGER">Manager</Option>
+                <Option value="ADMIN">Admin</Option>
+              </Select>
+            </Row>
+          ) : null}
+          {register ? (
+            <br />
+          ) : null}
+          {showLocations ? (
+            <Row type="flex" justify="center">
+              <Select className={styles.select} defaultValue={locations[0].Name} onChange={this.handleLocationChange}>
+                {locationOptions}
+              </Select>
+            </Row>
+          ) : null}
+          {showLocations ? (
+            <br />
+          ) : null}
           <Row type="flex" justify="center">
-            <Button style={{ marginRight: 25 }} type="danger" onClick={() => this.setState({ register: false })}>
+            <Button style={{ marginRight: 25 }} type="danger" onClick={() => this.setState({ register: false, showLocations: false })}>
               {register ? 'Cancel' : 'Guest'}
             </Button>
-            <Button type="danger" onClick={this.logIn}>
+            <Button type="danger" onClick={register ? this.register : this.logIn}>
               {register ? 'Register' : 'Log In'}
             </Button>
           </Row>
           <br />
-          <br />
-          <br />
           {!register ? (
-            <Row type="flex" justify="center">
-              <span style={{ color: '#ff4d4f' }}>Don&apos;t have an account? <button className={styles.textbutton} onClick={() => this.setState({ register: true })}>Register</button></span> {/* eslint-disable-line */}
-            </Row>
+            <div>
+              <Row type="flex" justify="center">
+                <span><button className={styles.textbutton}>Forgot password?</button></span> {/* eslint-disable-line */}
+              </Row>
+              <br />
+              <br />
+              <Row type="flex" justify="center">
+                <span style={{ color: '#ff4d4f' }}>Don&apos;t have an account? <button className={styles.textbutton} onClick={() => this.setState({ register: true })}>Register</button></span> {/* eslint-disable-line */}
+              </Row>
+            </div>
           ) : null}
         </div>
       </div>

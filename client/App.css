@@ -3,17 +3,77 @@
   width: 100%;
 }
 
+.header {
+  background-color: #ff4d4f;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .menu {
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  background-color: #ff4d4f;
 }
 
 .item {
-  background-color: inherit;
-  display: table;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #ff4d4f !important;
+  width: 7%;
+  display: inline-table;
+  float: left;
+}
+
+.last {
+  float: right;
+}
+
+.item:hover {
+  background-color: #131313 !important;
+}
+
+.item:hover .link {
+  color: #ff4d4f !important;
 }
 
 .link {
-  display: table-cell;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  display: table-cell !important;
+  vertical-align: middle;
+  text-align: center;
+  color: #fff !important;
+}
+
+.active {
+  background-color: #131313 !important;
+}
+
+.active .link {
+  color: #ff4d4f !important;
+}
+
+.logo {
+  width: 120px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  float: left;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.icon {
+  width: 80px;
+  height: 32px;
+  margin: 0 20px;
+  padding: 0;
   vertical-align: middle;
 }
