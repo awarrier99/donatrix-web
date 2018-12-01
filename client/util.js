@@ -17,7 +17,6 @@ export const checkLoggedIn = async (router, onRedirect) => {
   if (cookie) {
     const pos = cookie.indexOf('user:') + 5;
     const user = JSON.parse(cookie.substring(pos, cookie.length));
-    console.log(user);
     try {
       const res = await fetch('/api/checkUser', {
         method: 'POST',

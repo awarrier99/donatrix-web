@@ -9,6 +9,7 @@ import logo from './images/logo.png';
 import Auth from './containers/Auth';
 import { checkLoggedIn } from './util';
 import Dashboard from './containers/Dashboard';
+import ItemsDashboard from './containers/ItemsDashboard';
 import styles from './App.css';
 
 const { Content, Header } = Layout;
@@ -45,17 +46,17 @@ class App extends Component {
       .then(user => {
         if (user) {
           this.setState({ auth: false });
-          if (this.router.current.history.location.pathname !== '/dashboard') {
+          if (this.router.current.history.location.pathname === '/') {
             this.router.current.history.push('/dashboard');
             message.success(`Already logged in as ${user}`);
           }
         }
-        this.setState({ withOnLogin: () => <Auth onLogin={onLogin} /> });
         const map = {
-          '/dashboard': '1'
+          '/dashboard': '1',
+          '/items': '2'
         };
         const defaultKey = map[this.router.current.history.location.pathname];
-        this.setState({ defaultKey });
+        this.setState({ withOnLogin: () => <Auth onLogin={onLogin} />, defaultKey });
       })
       .catch(console.error);
   }
@@ -74,15 +75,20 @@ class App extends Component {
           {!auth ? (
             <Header className={styles.header}>
               <div className={styles.logo}>
-                <Link to="/dashboard"><img className={styles.icon} src={logo} alt="" /></Link>
+                <Link to="/dashboard" onClick={() => this.setState({ defaultKey: '1' })}><img className={styles.icon} src={logo} alt="" /></Link>
               </div>
               <Menu className={styles.menu} ref={this.menu} defaultSelectedKeys={['1']} theme="dark">
                 <Item className={defaultKey === '1' ? [styles.item, styles.active] : styles.item} key="1">
-                  <Link className={styles.link} to="/dashboard">
+                  <Link className={styles.link} to="/dashboard" onClick={() => this.setState({ defaultKey: '1' })}>
                     Home
                   </Link>
                 </Item>
-                <Item className={[styles.item, styles.last]} key="2">
+                <Item className={defaultKey === '2' ? [styles.item, styles.active] : styles.item} key="2">
+                  <Link className={styles.link} to="/items" onClick={() => this.setState({ defaultKey: '2' })}>
+                    Items
+                  </Link>
+                </Item>
+                <Item className={[styles.item, styles.last]} key="3">
                   <Link className={styles.link} to="/" onClick={clearCookie}>
                     Logout
                   </Link>
@@ -94,6 +100,7 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={withOnLogin} />
               <Route path="/dashboard" component={Dashboard} />
+              <Route path="/items" component={ItemsDashboard} />
             </Switch>
           </Content>
         </Layout>

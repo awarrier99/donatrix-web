@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Input, Row, Col, Button, message, Select
+  Input, Row, Col, Button, message, Select, Icon, Tooltip
 } from 'antd';
 import styles from './Auth.css';
 import logo from '../images/logo.png';
@@ -16,7 +16,8 @@ class Auth extends Component {
       locations: [],
       showLocations: false,
       type: 'USER',
-      locId: 0
+      locId: 0,
+      showPass: false
     };
 
     this.frstnameInput = React.createRef();
@@ -132,7 +133,9 @@ class Auth extends Component {
   }
 
   render() {
-    const { register, locations, showLocations } = this.state;
+    const {
+      register, locations, showLocations, showPass
+    } = this.state;
     const locationOptions = [];
     const createOptions = i => {
       const loc = locations[i];
@@ -141,6 +144,11 @@ class Auth extends Component {
     for (let i = 0; i < locations.length; i += 1) {
       locationOptions.push(createOptions(i));
     }
+    const passIcon = (
+      <Tooltip title={showPass ? 'Hide' : 'Show'}>
+        <Icon style={{ cursor: 'pointer' }} type={showPass ? 'unlock' : 'lock'} onClick={() => this.setState({ showPass: !showPass })} />
+      </Tooltip>
+    );
     return (
       <div className={styles.auth}>
         <div style={{ display: 'table-cell', verticalAlign: 'middle' }}>
@@ -151,7 +159,7 @@ class Auth extends Component {
           {register ? (
             <Row type="flex" justify="center">
               <Col span={4}>
-                <Input className={styles.input} ref={this.frstnameInput} placeholder="First Name" />
+                <Input className={styles.input} addonBefore={<Icon type="profile" />} ref={this.frstnameInput} placeholder="First Name" />
               </Col>
             </Row>
           ) : null}
@@ -161,7 +169,7 @@ class Auth extends Component {
           {register ? (
             <Row type="flex" justify="center">
               <Col span={4}>
-                <Input className={styles.input} ref={this.lastnameInput} placeholder="Last Name" />
+                <Input className={styles.input} addonBefore={<Icon type="profile" />} ref={this.lastnameInput} placeholder="Last Name" />
               </Col>
             </Row>
           ) : null}
@@ -170,7 +178,7 @@ class Auth extends Component {
           ) : null}
           <Row type="flex" justify="center">
             <Col span={4}>
-              <Input className={styles.input} ref={this.usernameInput} placeholder="Username" />
+              <Input className={styles.input} addonBefore={<Icon type="user" />} ref={this.usernameInput} placeholder="Username" />
             </Col>
           </Row>
           <br />
@@ -178,9 +186,10 @@ class Auth extends Component {
             <Col span={4}>
               <Input
                 className={styles.input}
+                addonBefore={passIcon}
                 ref={this.passwordInput}
                 placeholder="Password"
-                type="password"
+                type={showPass ? 'text' : 'password'}
                 onKeyPress={e => {
                   if (e.key === 'Enter') this.logIn();
                 }}
@@ -191,7 +200,13 @@ class Auth extends Component {
           {register ? (
             <Row type="flex" justify="center">
               <Col span={4}>
-                <Input className={styles.input} ref={this.confpassInput} placeholder="Confirm Password" type="password" />
+                <Input
+                  className={styles.input}
+                  addonBefore={passIcon}
+                  ref={this.confpassInput}
+                  placeholder="Confirm Password"
+                  type={showPass ? 'text' : 'password'}
+                />
               </Col>
             </Row>
           ) : null}

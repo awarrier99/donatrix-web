@@ -1,0 +1,40 @@
+.itemsdash {
+  width: 100vw;
+  background-color: #131313;
+  display: table;
+}
+
+.search {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ff4d4f !important;
+}
+
+.search:hover {
+  border-color: #ff4d4f;
+}
+
+.search:focus {
+  border-color: #ff4d4f;
+}
+
+.card {
+  width: 80%;
+  background-color: transparent;
+}
+
+.list {
+  width: 90%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.item {
+  color: #ff4d4f;
+}
+
+.description {
+  color: #fff;
+}
+
+.row {
+  margin-bottom: 5%;
+}

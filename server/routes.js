@@ -6,6 +6,8 @@ module.exports = function routes(app) {
   app.post('/api/register', api.register);
   app.post('/api/checkUser', api.checkUser);
   app.get('/api/locations', api.getLocations);
+  app.post('/api/location', api.getLocationById);
+  app.get('/api/items', api.getItems);
 
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/app.html'));
