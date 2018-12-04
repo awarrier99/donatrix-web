@@ -1,0 +1,7 @@
+.tag {
+  background-color: #ff4d4f
+}
+
+.uncheckedTag:hover {
+  color: #ff4d4f !important;
+}

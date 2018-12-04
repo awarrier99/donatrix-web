@@ -8,7 +8,6 @@ import styles from './ItemsDashboard.css';
 
 const { Item } = List;
 const { Meta } = Item;
-// const { Search } = Input;
 
 class ItemsDashboard extends Component {
   static showDetails(item) {
@@ -126,7 +125,7 @@ class ItemsDashboard extends Component {
                   <AutoComplete
                     unclick={click}
                     className={styles.autocomplete}
-                    data={data.map(item => item.s_description)}
+                    data={data}
                     onClick={() => this.setState({ click: false })}
                     onSearch={matchingData => this.setState({ listData: data.filter(item => matchingData.includes(item.s_description)) })}
                   />
