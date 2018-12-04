@@ -54,7 +54,8 @@ class AutoComplete extends Component {
         </Menu.Item>
       );
     };
-    for (let i = 0; i < boldedMatchingData.length; i += 1) {
+    const numOptions = boldedMatchingData.length > 5 ? 5 : boldedMatchingData.length;
+    for (let i = 0; i < numOptions; i += 1) {
       matchingItems.push(createItem(i));
     }
     this.setState({ matchingData, matchingItems });
@@ -76,12 +77,13 @@ class AutoComplete extends Component {
           </Menu.Item>
         );
       };
-      for (let i = 0; i < data.length; i += 1) {
+      const numOptions = data.length > 5 ? 5 : data.length;
+      for (let i = 0; i < numOptions; i += 1) {
         items.push(createItem(i));
       }
     }
     const menu = (
-      <Menu onClick={e => { this.input.current.input.value = matchingData[e.key]; this.input.current.focus(); }}>
+      <Menu onClick={e => { this.input.current.input.value = matchingData[e.key]; this.input.current.focus(); this.search(matchingData[e.key]); }}>
         {items}
       </Menu>
     );
@@ -89,7 +91,6 @@ class AutoComplete extends Component {
     return (
       <Dropdown overlay={menu} visible={!unclick && visible}>
         <Input
-          id="autocomplete-input"
           className={className}
           addonBefore={<Icon type="search" />}
           placeholder="Search items"

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   List, Skeleton, Button, Modal, Tag, Row, Card
 } from 'antd';
+import InfiniteScroll from 'react-infinite-scroller';
 import AutoComplete from '../components/AutoComplete';
 import styles from './ItemsDashboard.css';
 
@@ -63,9 +64,15 @@ class ItemsDashboard extends Component {
     this.state = {
       initLoading: true,
       data: [],
+      allListData: [],
       listData: [],
-      click: true
+      hasMore: true,
+      click: true,
+      containerHeight: '360px'
     };
+
+    this.scrollParent = React.createRef();
+    this.loadMore = this.loadMore.bind(this);
   }
 
   componentDidMount() {
@@ -81,9 +88,11 @@ class ItemsDashboard extends Component {
       .then(json => {
         if (this._isMounted) {
           if (json.success) {
-            this.setState({ data: json.items, listData: json.items });
+            this.setState({ data: json.items, allListData: json.items, listData: json.items.slice(0, 4) });
           }
           this.setState({ initLoading: false });
+          this.setState({ containerHeight: document.getElementsByClassName('list-item')[0].clientHeight * 4 });
+          console.log(document.getElementsByClassName('list-item')[0].clientHeight * 4);
         }
       })
       .catch(console.error);
@@ -93,9 +102,18 @@ class ItemsDashboard extends Component {
     this._isMounted = false;
   }
 
+  loadMore() {
+    const { allListData, listData } = this.state;
+    if (listData.length < allListData.length) {
+      this.setState({ listData: allListData.slice(0, listData.length + 4) });
+    } else {
+      this.setState({ hasMore: false });
+    }
+  }
+
   render() {
     const {
-      initLoading, data, listData, click
+      initLoading, data, listData, click, hasMore, containerHeight
     } = this.state;
     const { height } = this.props;
     return (
@@ -114,24 +132,33 @@ class ItemsDashboard extends Component {
                   />
                 </div>
               </Row>
-              <List
-                className={styles.list}
-                bordered
-                loading={initLoading}
-                itemLayout="horizontal"
-                dataSource={listData}
-                renderItem={item => (
-                  <Item actions={[<Button>Edit</Button>, <Button onClick={() => ItemsDashboard.showDetails(item)}>Details</Button>]}>
-                    <Skeleton avatar title={false} loading={initLoading} active>
-                      <Meta
-                        // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                        title={<span className={styles.item}>{item.s_description}</span>}
-                        description={<span className={styles.description}>{item.l_description}</span>}
-                      />
-                    </Skeleton>
-                  </Item>
-                )}
-              />
+              <div className={styles.scrollContainer} style={{ height: containerHeight }} ref={this.scrollParent}>
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={0}
+                  loadMore={this.loadMore}
+                  hasMore={hasMore}
+                  useWindow={false}
+                  getScrollParent={() => this.scrollParent.current}
+                >
+                  <List
+                    loading={initLoading}
+                    itemLayout="horizontal"
+                    dataSource={listData}
+                    renderItem={item => (
+                      <Item className="list-item" actions={[<Button>Edit</Button>, <Button onClick={() => ItemsDashboard.showDetails(item)}>Details</Button>]}>
+                        <Skeleton avatar title={false} loading={initLoading} active>
+                          <Meta
+                            // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                            title={<span className={styles.item}>{item.s_description}</span>}
+                            description={<span className={styles.description}>{item.l_description}</span>}
+                          />
+                        </Skeleton>
+                      </Item>
+                    )}
+                  />
+                </InfiniteScroll>
+              </div>
             </Card>
           </Row>
         </div>
