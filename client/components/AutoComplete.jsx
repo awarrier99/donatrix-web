@@ -3,28 +3,37 @@ import {
   Input, Dropdown, Menu, Icon
 } from 'antd';
 
-class AutoComplete extends Component { // eslint-disable-line
+class AutoComplete extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      search: '',
-      visible: false
+      visible: false,
+      matchingData: [],
+      matchingItems: []
     };
 
     this.input = React.createRef();
+    this.search = this.search.bind(this);
   }
 
-  render() {
-    const { data, className, unclick, onClick } = this.props;
-    const { search, visible } = this.state;
+  componentDidUpdate(prevProps, prevState) {
+    const { onSearch } = this.props;
+    const { matchingData } = this.state;
+    if (prevState.matchingData.length !== matchingData.length) {
+      onSearch(matchingData);
+    }
+  }
+
+  search(value) {
+    const { data } = this.props;
     const matchingItems = [];
     const boldFirstMatch = item => {
-      if (search) {
-        const pos = item.toLowerCase().indexOf(search.toLowerCase());
+      if (value) {
+        const pos = item.toLowerCase().indexOf(value.toLowerCase());
         const before = item.substring(0, pos);
-        const match = item.substring(pos, pos + search.length);
-        const after = item.substring(pos + search.length);
+        const match = item.substring(pos, pos + value.length);
+        const after = item.substring(pos + value.length);
         return (
           <span>
             {before}
@@ -35,7 +44,7 @@ class AutoComplete extends Component { // eslint-disable-line
       }
       return item;
     };
-    const matchingData = data.filter(item => item.toLowerCase().includes(search.toLowerCase()));
+    const matchingData = data.filter(item => item.toLowerCase().includes(value.toLowerCase()));
     const boldedMatchingData = matchingData.map(boldFirstMatch);
 
     const createItem = i => {
@@ -48,9 +57,32 @@ class AutoComplete extends Component { // eslint-disable-line
     for (let i = 0; i < boldedMatchingData.length; i += 1) {
       matchingItems.push(createItem(i));
     }
+    this.setState({ matchingData, matchingItems });
+  }
+
+  render() {
+    const {
+      className, unclick, onClick, data
+    } = this.props;
+    const { visible, matchingData, matchingItems } = this.state;
+    let items = matchingItems;
+
+    if (data.length > 0 && matchingItems.length === 0) {
+      items = [];
+      const createItem = i => {
+        return (
+          <Menu.Item key={i}>
+            {data[i]}
+          </Menu.Item>
+        );
+      };
+      for (let i = 0; i < data.length; i += 1) {
+        items.push(createItem(i));
+      }
+    }
     const menu = (
       <Menu onClick={e => { this.input.current.input.value = matchingData[e.key]; this.input.current.focus(); }}>
-        {matchingItems}
+        {items}
       </Menu>
     );
 
@@ -61,7 +93,7 @@ class AutoComplete extends Component { // eslint-disable-line
           className={className}
           addonBefore={<Icon type="search" />}
           placeholder="Search items"
-          onChange={e => this.setState({ search: e.target.value, visible: true })}
+          onChange={e => { this.search(e.target.value); this.setState({ visible: true }); }}
           onClick={e => { e.stopPropagation(); this.setState({ visible: true }); onClick(); }}
           ref={this.input}
         />

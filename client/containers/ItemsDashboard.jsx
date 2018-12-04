@@ -63,6 +63,7 @@ class ItemsDashboard extends Component {
     this.state = {
       initLoading: true,
       data: [],
+      listData: [],
       click: true
     };
   }
@@ -80,7 +81,7 @@ class ItemsDashboard extends Component {
       .then(json => {
         if (this._isMounted) {
           if (json.success) {
-            this.setState({ data: json.items });
+            this.setState({ data: json.items, listData: json.items });
           }
           this.setState({ initLoading: false });
         }
@@ -93,7 +94,9 @@ class ItemsDashboard extends Component {
   }
 
   render() {
-    const { initLoading, data, click } = this.state;
+    const {
+      initLoading, data, listData, click
+    } = this.state;
     const { height } = this.props;
     return (
       <div className={styles.itemsdash} style={{ height }} onClick={() => this.setState({ click: true })}> {/* eslint-disable-line */}
@@ -107,6 +110,7 @@ class ItemsDashboard extends Component {
                     className={styles.autocomplete}
                     data={data.map(item => item.s_description)}
                     onClick={() => this.setState({ click: false })}
+                    onSearch={matchingData => this.setState({ listData: data.filter(item => matchingData.includes(item.s_description)) })}
                   />
                 </div>
               </Row>
@@ -115,7 +119,7 @@ class ItemsDashboard extends Component {
                 bordered
                 loading={initLoading}
                 itemLayout="horizontal"
-                dataSource={data}
+                dataSource={listData}
                 renderItem={item => (
                   <Item actions={[<Button>Edit</Button>, <Button onClick={() => ItemsDashboard.showDetails(item)}>Details</Button>]}>
                     <Skeleton avatar title={false} loading={initLoading} active>
