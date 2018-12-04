@@ -23,7 +23,7 @@
 }
 
 .autoContainer {
-  width: 50%;
+  width: 60%;
 }
 
 .scrollContainer {
@@ -47,4 +47,18 @@
 
 .row {
   margin-bottom: 5%;
+}
+
+.select {
+  width: 40%;
+  color: #ff4d4f;
+  vertical-align: middle;
+}
+
+.select:hover {
+  border-color: #ff4d4f;
+}
+
+.select:focus {
+  border-color: #ff4d4f;
 }

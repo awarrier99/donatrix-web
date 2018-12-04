@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  List, Skeleton, Button, Modal, Tag, Row, Card
+  List, Skeleton, Button, Modal, Tag, Row, Card, Select
 } from 'antd';
 import InfiniteScroll from 'react-infinite-scroller';
 import AutoComplete from '../components/AutoComplete';
@@ -8,6 +8,7 @@ import styles from './ItemsDashboard.css';
 
 const { Item } = List;
 const { Meta } = Item;
+const { Option } = Select;
 
 class ItemsDashboard extends Component {
   static showDetails(item) {
@@ -63,15 +64,19 @@ class ItemsDashboard extends Component {
     this.state = {
       initLoading: true,
       data: [],
+      filteredData: [],
       allListData: [],
       listData: [],
       hasMore: true,
       click: true,
-      containerHeight: '360px'
+      containerHeight: '360px',
+      locations: [],
+      locId: 0
     };
 
     this.scrollParent = React.createRef();
     this.loadMore = this.loadMore.bind(this);
+    this.handleLocationChange = this.handleLocationChange.bind(this);
   }
 
   componentDidMount() {
@@ -87,11 +92,28 @@ class ItemsDashboard extends Component {
       .then(json => {
         if (this._isMounted) {
           if (json.success) {
-            this.setState({ data: json.items, allListData: json.items, listData: json.items.slice(0, 4) });
+            this.setState({
+              data: json.items, filteredData: json.items, allListData: json.items, listData: json.items.slice(0, 4)
+            });
           }
           this.setState({ initLoading: false });
           this.setState({ containerHeight: document.getElementsByClassName('list-item')[0].clientHeight * 4 });
-          console.log(document.getElementsByClassName('list-item')[0].clientHeight * 4);
+        }
+      })
+      .catch(console.error);
+
+    fetch('/api/locations', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          if (this._isMounted) {
+            this.setState({ locations: json.locations });
+          }
         }
       })
       .catch(console.error);
@@ -110,24 +132,46 @@ class ItemsDashboard extends Component {
     }
   }
 
+  handleLocationChange(value) {
+    const { data } = this.state;
+    const filteredData = value === 0 ? data : data.filter(item => item.location === value);
+    this.setState({ locId: value, filteredData, listData: filteredData });
+  }
+
   render() {
     const {
-      initLoading, data, listData, click, hasMore, containerHeight
+      initLoading, filteredData, listData, click, hasMore, containerHeight, locations, locId
     } = this.state;
     const { height } = this.props;
+    const locationOptions = [];
+    const createOptions = i => {
+      const loc = locations[i];
+      return <Option value={loc.idLocation} key={i}>{loc.Name}</Option>;
+    };
+    for (let i = 0; i < locations.length; i += 1) {
+      locationOptions.push(createOptions(i));
+    }
     return (
       <div className={styles.itemsdash} style={{ height }} onClick={() => this.setState({ click: true })}> {/* eslint-disable-line */}
         <div style={{ display: 'table-cell', verticalAlign: 'middle' }}>
           <Row type="flex" justify="center">
             <Card className={styles.card} title={<span style={{ color: '#ff4d4f' }}>Items</span>}>
+              <Row type="flex" justify="center" align="middle" style={{ marginBottom: '3%' }}>
+                <span style={{ color: '#fff' }}>Locations:&nbsp;</span>
+                <Select className={styles.select} defaultValue="All" onChange={this.handleLocationChange}>
+                  <Option value={0} key={-1}>All</Option>
+                  {locationOptions}
+                </Select>
+              </Row>
               <Row type="flex" justify="center">
                 <div className={styles.autoContainer}>
                   <AutoComplete
-                    unclick={click}
                     className={styles.autocomplete}
-                    data={data}
+                    location={locId}
+                    unclick={click}
+                    data={filteredData}
                     onClick={() => this.setState({ click: false })}
-                    onSearch={matchingData => this.setState({ listData: data.filter(item => matchingData.includes(item.s_description)) })}
+                    onSearch={matchingData => this.setState({ listData: filteredData.filter(item => matchingData.includes(item.s_description)) })}
                   />
                 </div>
               </Row>

@@ -22,10 +22,13 @@ class AutoComplete extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { onSearch } = this.props;
-    const { matchingData } = this.state;
-    if (prevState.matchingData.length !== matchingData.length) {
+    const { onSearch, location } = this.props;
+    const { matchingData, categories } = this.state;
+    if (JSON.stringify(prevState.matchingData) !== JSON.stringify(matchingData)) {
       onSearch(matchingData);
+    }
+    if (prevProps.location !== location) {
+      this.search(this.input.current.input.value, categories);
     }
   }
 
@@ -100,9 +103,10 @@ class AutoComplete extends Component {
     const menu = (
       <Menu onClick={e => {
         if (e.key !== '-1') {
-          this.input.current.input.value = matchingData[e.key];
+          const searchData = matchingData.length > 0 ? matchingData : reducedData;
+          this.input.current.input.value = searchData[e.key];
           this.input.current.focus();
-          this.search(matchingData[e.key]);
+          this.search(searchData[e.key], categories);
         } else {
           e.domEvent.stopPropagation();
         }
@@ -157,6 +161,21 @@ class AutoComplete extends Component {
             Kitchen
           </CheckableTag>
           <CheckableTag
+            className={categories.includes('electronics') ? styles.tag : styles.uncheckedTag}
+            onChange={checked => {
+              if (checked) {
+                this.setState({ categories: categories.concat('electronics') });
+                this.search(this.input.current.value, categories.concat(('electronics')));
+              } else {
+                this.setState({ categories: categories.filter(cat => cat !== 'electronics') });
+                this.search(this.input.current.value, categories.filter(cat => cat !== 'electronics'));
+              }
+            }}
+            checked={categories.includes('electronics')}
+          >
+            Electronics
+          </CheckableTag>
+          <CheckableTag
             className={categories.includes('household') ? styles.tag : styles.uncheckedTag}
             onChange={checked => {
               if (checked) {
@@ -189,14 +208,13 @@ class AutoComplete extends Component {
         </Menu.Item>
       </Menu>
     );
-
     return (
       <Dropdown overlay={menu} visible={!unclick && visible}>
         <Input
           className={className}
           addonBefore={<Icon type="search" />}
           placeholder="Search items"
-          onChange={e => { this.search(e.target.value); this.setState({ visible: true }); }}
+          onChange={e => { this.search(e.target.value, categories); this.setState({ visible: true }); }}
           onClick={e => { e.stopPropagation(); this.setState({ visible: true }); onClick(); }}
           ref={this.input}
         />
