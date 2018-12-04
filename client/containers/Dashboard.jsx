@@ -8,18 +8,11 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      height: 0
-    };
     this.userType = getUser().type;
   }
 
-  componentDidMount() {
-    this.setState({ height: document.getElementsByClassName('ant-layout-content')[0].clientHeight });
-  }
-
   render() {
-    const { height } = this.state;
+    const { height } = this.props;
     return (
       <div className={styles.dashboard} style={{ height }}>
         <div style={{ display: 'table-cell', verticalAlign: 'middle' }}>

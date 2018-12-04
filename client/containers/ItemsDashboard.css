@@ -4,25 +4,30 @@
   display: table;
 }
 
-.search {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  color: #ff4d4f !important;
-}
-
-.search:hover {
-  border-color: #ff4d4f;
-}
-
-.search:focus {
-  border-color: #ff4d4f;
-}
-
 .card {
-  width: 80%;
+  width: 70%;
   background-color: transparent;
 }
 
+.autocomplete {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ff4d4f;
+}
+
+.autocomplete:hover {
+  border-color: #ff4d4f;
+}
+
+.autocomplete:focus {
+  border-color: #ff4d4f;
+}
+
+.autoContainer {
+  width: 30%;
+}
+
 .list {
+  margin-top: 15%;
   width: 90%;
   background-color: rgba(255, 255, 255, 0.1);
 }

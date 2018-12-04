@@ -21,12 +21,13 @@ class App extends Component {
 
     this.state = {
       auth: true,
-      withOnLogin: () => null,
-      defaultKey: '1'
+      defaultKey: '1',
+      contentHeight: 0
     };
 
     this.router = React.createRef();
     this.menu = React.createRef();
+    this.content = React.createRef();
   }
 
   componentDidMount() {
@@ -38,10 +39,7 @@ class App extends Component {
     const onRedirect = () => {
       message.error('You must log in to view that page');
     };
-    const onLogin = () => {
-      this.setState({ auth: false });
-      this.router.current.history.push('/dashboard');
-    };
+    this.setState({ contentHeight: document.getElementsByClassName('ant-layout-content')[0].clientHeight });
     checkLoggedIn(this.router, onRedirect)
       .then(user => {
         if (user) {
@@ -56,17 +54,43 @@ class App extends Component {
           '/items': '2'
         };
         const defaultKey = map[this.router.current.history.location.pathname];
-        this.setState({ withOnLogin: () => <Auth onLogin={onLogin} />, defaultKey });
+        this.router.current.history.listen(location => {
+          const key = map[location.pathname];
+          this.setState({ defaultKey: key });
+        });
+
+        this.setState({ defaultKey });
       })
       .catch(console.error);
   }
 
+  componentDidUpdate() {
+    const { contentHeight } = this.state;
+    const height = document.getElementsByClassName('ant-layout-content')[0].clientHeight;
+    if (contentHeight !== height) {
+      this.setState({ contentHeight: height }); // eslint-disable-line
+    }
+  }
+
   render() {
-    const { auth, withOnLogin, defaultKey } = this.state;
+    const {
+      auth, defaultKey
+    } = this.state;
     const clearCookie = () => {
       document.cookie = 'session=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
       this.setState({ auth: true });
       message.success('Logged out successfully');
+    };
+    const onLogin = () => {
+      this.setState({ auth: false });
+      this.router.current.history.push('/dashboard');
+    };
+    const withOnLogin = () => <Auth onLogin={onLogin} />;
+    const withHeight = WrappedComponent => {
+      const { contentHeight } = this.state;
+      return props => {
+        return <WrappedComponent height={contentHeight} {...props} />;
+      };
     };
 
     return (
@@ -75,16 +99,16 @@ class App extends Component {
           {!auth ? (
             <Header className={styles.header}>
               <div className={styles.logo}>
-                <Link to="/dashboard" onClick={() => this.setState({ defaultKey: '1' })}><img className={styles.icon} src={logo} alt="" /></Link>
+                <Link to="/dashboard"><img className={styles.icon} src={logo} alt="" /></Link>
               </div>
               <Menu className={styles.menu} ref={this.menu} defaultSelectedKeys={['1']} theme="dark">
                 <Item className={defaultKey === '1' ? [styles.item, styles.active] : styles.item} key="1">
-                  <Link className={styles.link} to="/dashboard" onClick={() => this.setState({ defaultKey: '1' })}>
+                  <Link className={styles.link} to="/dashboard">
                     Home
                   </Link>
                 </Item>
                 <Item className={defaultKey === '2' ? [styles.item, styles.active] : styles.item} key="2">
-                  <Link className={styles.link} to="/items" onClick={() => this.setState({ defaultKey: '2' })}>
+                  <Link className={styles.link} to="/items">
                     Items
                   </Link>
                 </Item>
@@ -96,11 +120,11 @@ class App extends Component {
               </Menu>
             </Header>
           ) : null}
-          <Content>
+          <Content ref={this.content}>
             <Switch>
               <Route exact path="/" component={withOnLogin} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/items" component={ItemsDashboard} />
+              <Route path="/dashboard" component={withHeight(Dashboard)} />
+              <Route path="/items" component={withHeight(ItemsDashboard)} />
             </Switch>
           </Content>
         </Layout>

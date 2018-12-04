@@ -8,6 +8,8 @@ import logo from '../images/logo.png';
 const { Option } = Select;
 
 class Auth extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -17,7 +19,8 @@ class Auth extends Component {
       showLocations: false,
       type: 'USER',
       locId: 0,
-      showPass: false
+      showPass: false,
+      loading: false
     };
 
     this.frstnameInput = React.createRef();
@@ -32,6 +35,8 @@ class Auth extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
+
     fetch('/api/locations', {
       method: 'GET',
       headers: {
@@ -41,7 +46,9 @@ class Auth extends Component {
       .then(res => res.json())
       .then(json => {
         if (json.success) {
-          this.setState({ locations: json.locations });
+          if (this._isMounted) {
+            this.setState({ locations: json.locations });
+          }
         }
       })
       .catch(console.error);
@@ -52,7 +59,12 @@ class Auth extends Component {
     });
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   logIn() {
+    this.setState({ loading: true });
     const { register } = this.state;
     const username = this.usernameInput.current.input.value;
     const password = this.passwordInput.current.input.value;
@@ -80,11 +92,13 @@ class Auth extends Component {
             message.error(json.msg);
           }
         })
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => { if (this._isMounted) this.setState({ loading: false }); });
     }
   }
 
   register() {
+    this.setState({ loading: true });
     const frstname = this.frstnameInput.current.input.value;
     const lastname = this.lastnameInput.current.input.value;
     const name = `${frstname} ${lastname}`;
@@ -119,7 +133,8 @@ class Auth extends Component {
             message.error(json.msg);
           }
         })
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => { if (this._isMounted) this.setState({ loading: false }); });
     }
   }
 
@@ -134,7 +149,7 @@ class Auth extends Component {
 
   render() {
     const {
-      register, locations, showLocations, showPass
+      register, locations, showLocations, showPass, loading
     } = this.state;
     const locationOptions = [];
     const createOptions = i => {
@@ -240,7 +255,7 @@ class Auth extends Component {
             <Button style={{ marginRight: 25 }} type="danger" onClick={() => this.setState({ register: false, showLocations: false })}>
               {register ? 'Cancel' : 'Guest'}
             </Button>
-            <Button type="danger" onClick={register ? this.register : this.logIn}>
+            <Button type="danger" onClick={register ? this.register : this.logIn} loading={loading}>
               {register ? 'Register' : 'Log In'}
             </Button>
           </Row>
