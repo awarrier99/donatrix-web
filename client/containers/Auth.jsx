@@ -19,7 +19,7 @@ class Auth extends Component {
       locId: 0
     };
 
-    this.frstnameInput = React.createRef();
+    this.firstnameInput = React.createRef();
     this.lastnameInput = React.createRef();
     this.usernameInput = React.createRef();
     this.passwordInput = React.createRef();
@@ -84,7 +84,7 @@ class Auth extends Component {
   }
 
   register() {
-    const frstname = this.frstnameInput.current.input.value;
+    const frstname = this.firstnameInput.current.input.value;
     const lastname = this.lastnameInput.current.input.value;
     const name = `${frstname} ${lastname}`;
     const username = this.usernameInput.current.input.value;
@@ -151,7 +151,7 @@ class Auth extends Component {
           {register ? (
             <Row type="flex" justify="center">
               <Col span={4}>
-                <Input className={styles.input} ref={this.frstnameInput} placeholder="First Name" />
+                <Input className={styles.input} ref={this.firstnameInput} placeholder="First Name" />
               </Col>
             </Row>
           ) : null}
@@ -189,27 +189,23 @@ class Auth extends Component {
           </Row>
           <br />
           {register ? (
-            <Row type="flex" justify="center">
-              <Col span={4}>
-                <Input className={styles.input} ref={this.confpassInput} placeholder="Confirm Password" type="password" />
-              </Col>
-            </Row>
-          ) : null}
-          {register ? (
-            <br />
-          ) : null}
-          {register ? (
-            <Row type="flex" justify="center">
-              <Select className={styles.select} defaultValue="USER" onChange={this.handleUserTypeChange}>
-                <Option value="USER">User</Option>
-                <Option value="LOCATION_EMPLOYEE">Location Employee</Option>
-                <Option value="MANAGER">Manager</Option>
-                <Option value="ADMIN">Admin</Option>
-              </Select>
-            </Row>
-          ) : null}
-          {register ? (
-            <br />
+            <div>
+              <Row type="flex" justify="center">
+                <Col span={4}>
+                  <Input className={styles.input} ref={this.confpassInput} placeholder="Confirm Password" type="password" />
+                </Col>
+              </Row>
+              <br />
+              <Row type="flex" justify="center">
+                <Select className={styles.select} defaultValue="USER" onChange={this.handleUserTypeChange}>
+                  <Option value="USER">User</Option>
+                  <Option value="LOCATION_EMPLOYEE">Location Employee</Option>
+                  <Option value="MANAGER">Manager</Option>
+                  <Option value="ADMIN">Admin</Option>
+                </Select>
+              </Row>
+              <br />
+            </div>
           ) : null}
           {showLocations ? (
             <Row type="flex" justify="center">
